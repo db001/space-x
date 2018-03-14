@@ -55,10 +55,11 @@ function formatDate(date) {
 /* --- Get more info on individual launch on button click --- */
 
 // Endpoint stub for API queries
-const flightURL = 'https://api.spacexdata.com/v2/launches?';
+const flightURL = 'https://api.spacexdata.com/v2/launches?flight_number=';
+const rocketURL = 'https://api.spacexdata.com/v2/rockets/';
 
 async function callFLightAPI(url, id) {
-  let response = await fetch(`${url}flight_number=${id}`);
+  let response = await fetch(`${url}${id}`);
   let data = await response.json();
   displayFlightData(data[0]);
 }
@@ -70,9 +71,16 @@ function getFlightDetails(ele) {
 
 function displayFlightData(flight) {
   const flightDiv = document.querySelector('.flightDetails');
+  console.log(flight);
   if(!flight) {
     flightDiv.innerHTML = "Sorry, this flight has no further details";
     return;
   }
-  
+  flightDiv.innerHTML = `
+    <p>${flight.details}</p>
+    <p>${flight.launch_site.site_name_long}</p>
+    <img src="${flight.links.mission_patch}">
+    <h4>Rocket Details</h4>
+    <p>ID: ${flight.rocket.rocket_id}, Name: ${flight.rocket.rocket_name}</p>
+  `
 }
