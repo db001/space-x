@@ -23,7 +23,10 @@ thead {
 tbody tr:nth-child(odd) {
   background-color: rgba(200, 200, 200, 0.5);
 }
-
+.flightDetails, .rocketInfo {
+  width: 90%;
+  margin: auto;
+}
 .flightDetails img{
   width: 150px;
   height: auto;

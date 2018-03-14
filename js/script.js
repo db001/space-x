@@ -26,7 +26,7 @@ function displayData(data) {
           ${checkPastOrFuture(launch.launch_date_utc) === 'Launched' ? ' - ' + launchSuccess(launch) : ''}
         </td>
         <td>
-          <button class="infoButton" id="${launch.flight_number}" onclick="getFlightDetails(this)">Click</button>
+          <button class="infoButton" id="${launch.flight_number}" data-rocket=${launch.rocket.rocket_id} onclick="getFlightDetails(this)">Click</button>
         </td>
       </tr>
     `
@@ -55,32 +55,66 @@ function formatDate(date) {
 /* --- Get more info on individual launch on button click --- */
 
 // Endpoint stub for API queries
+// Individual flight
 const flightURL = 'https://api.spacexdata.com/v2/launches?flight_number=';
+
+// Rocket information
 const rocketURL = 'https://api.spacexdata.com/v2/rockets/';
 
-async function callFLightAPI(url, id) {
-  let response = await fetch(`${url}${id}`);
+// Get flight number from button id
+async function getFlightDetails(ele) {
+
+  // Get data for flight 
+  let response = await fetch(`${flightURL}${ele.id}`);
   let data = await response.json();
   displayFlightData(data[0]);
-}
 
-// Get flight number from button id
-function getFlightDetails(ele) {
-  callFLightAPI(flightURL, ele.id);
+  // Get rocket data
+  let rocketResponse = await fetch(`${rocketURL}${ele.dataset.rocket}`);
+  let rocketData = await rocketResponse.json();
+  displayRocketInfo(rocketData);
 }
 
 function displayFlightData(flight) {
   const flightDiv = document.querySelector('.flightDetails');
-  console.log(flight);
   if(!flight) {
-    flightDiv.innerHTML = "Sorry, this flight has no further details";
+    flightDiv.innerHTML = `
+    <h4>Flight details</h4>  
+    <p>Sorry, this flight has no further details</p>
+    `;
     return;
   }
+
+  console.log(flight.links.mission_patch);
   flightDiv.innerHTML = `
+    <h4>Flight details</h4>
     <p>${flight.details}</p>
-    <p>${flight.launch_site.site_name_long}</p>
-    <img src="${flight.links.mission_patch}">
+    <p><strong>Launch site:</strong> ${flight.launch_site.site_name_long}</p>
+    <figure>
+      <img src="${flight.links.mission_patch}" alt="Flight ${flight.flight_number} Mission Patch" title="Flight ${flight.flight_number} Mission Patch">
+      <figcaption>Flight ${flight.flight_number} Mission Patch</figcaption>
+    </figure>
+    <br>
+  `
+}
+
+function displayRocketInfo(rocket) {
+  const rocketDiv = document.querySelector('.rocketInfo');
+  if(!rocketDiv) {
+    rocketDiv.innerHTML = `
+      <h4>Rocket Details</h4>
+      <p>Sorry, this flight has no further details</p>
+    `
+    ;
+    return;
+  }
+  rocketDiv.innerHTML = `
     <h4>Rocket Details</h4>
-    <p>ID: ${flight.rocket.rocket_id}, Name: ${flight.rocket.rocket_name}</p>
+    <p><strong>Name:</strong> ${rocket.name}, ID: ${rocket.id}</p>
+    <p><strong>Description:</strong> ${rocket.description}</p>
+    <p><strong>Height:</strong> ${rocket.height.meters} metres</p>
+    <p><strong>Mass:</strong> ${rocket.mass.kg} kg</p>
+    <p><strong>Number </strong>of stages: ${rocket.stages}</p>
+    
   `
 }
