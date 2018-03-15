@@ -1,6 +1,10 @@
 # space-x
 
-Technical interview challenge
+*Technical interview challenge*
+
+Tested in Chrome.  Can be run by opening index.html in the browser.
+
+### Task details
 
 Your task is to query the r/SpaceX API and display the results. 
 
