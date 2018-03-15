@@ -6,6 +6,12 @@ const allLaunchesURL = 'https://api.spacexdata.com/v2/launches/all';
 // Get launch data from API
 const getLaunchData = async (url) => {
   let response = await fetch(url);
+
+  // Check if response is ok, if not throw an error
+  if(!response.ok) {
+    throw Error(`Error fetching API, response status: ${response.statusText}`);
+  }
+
   let data = await response.json();
   data = data.slice(-10);
   displayData(data);
@@ -52,7 +58,7 @@ function formatDate(date) {
 }
 
 
-/* --- Get more info on individual launch on button click --- */
+/* --- Get more info on individual launch when triggered by button click --- */
 
 // Endpoint stub for API queries
 // Individual flight
@@ -66,11 +72,23 @@ async function getFlightDetails(ele) {
 
   // Get data for flight 
   let response = await fetch(`${flightURL}${ele.id}`);
+
+  // Error checking
+  if(!response.ok) {
+    throw Error(`Error fetching flight details, response status: ${response.statusText}`);
+  }
+
   let data = await response.json();
   displayFlightData(data[0]);
 
   // Get rocket data
   let rocketResponse = await fetch(`${rocketURL}${ele.dataset.rocket}`);
+
+  // Error checking
+  if(!response.ok) {
+    throw Error(`Error fetching rocket details, response status: ${response.statusText}`);
+  }
+
   let rocketData = await rocketResponse.json();
   displayRocketInfo(rocketData);
 }
@@ -85,7 +103,6 @@ function displayFlightData(flight) {
     return;
   }
 
-  console.log(flight.links.mission_patch);
   flightDiv.innerHTML = `
     <h4>Flight details</h4>
     <p>${flight.details}</p>
@@ -110,11 +127,11 @@ function displayRocketInfo(rocket) {
   }
   rocketDiv.innerHTML = `
     <h4>Rocket Details</h4>
-    <p><strong>Name:</strong> ${rocket.name}, ID: ${rocket.id}</p>
+    <p><strong>Name:</strong> ${rocket.name}, <strong>ID:</strong> ${rocket.id}</p>
     <p><strong>Description:</strong> ${rocket.description}</p>
     <p><strong>Height:</strong> ${rocket.height.meters} metres</p>
     <p><strong>Mass:</strong> ${rocket.mass.kg} kg</p>
-    <p><strong>Number </strong>of stages: ${rocket.stages}</p>
+    <p><strong>Number of stages:</strong> ${rocket.stages}</p>
     
   `
 }
